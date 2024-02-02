@@ -72,6 +72,6 @@ bx.legend(loc = 'lower right')
 cx = axes[2]
 cx.set_title('Covariance Matrix (Gaussian Fit)')
 cx.imshow(np.log(np.abs(pcov)))
-fig.colorbar(cx.imshow(np.log(np.abs(pcov))), ax=cx)
+fig.colorbar(cx.imshow(np.log(np.abs(pcov))), ax = cx)
 
 plt.show()
