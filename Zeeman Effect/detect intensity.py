@@ -7,7 +7,7 @@ from scipy.signal import argrelextrema, find_peaks
 
 #Open image, convert to grayscale
 
-im = Image.open('Zeeman Effect\TEST3.jpg')
+im = Image.open('Zeeman Effect\Test Images\TEST3.jpg')
 im = im.convert('LA')
 x, y = im.size
 # im.show()
