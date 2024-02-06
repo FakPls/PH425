@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from scipy.optimize import curve_fit
 
-voltage = np.array([0, 0.3, 0.6, 0.9, 1.20, 1.50, 1.80, 2.10, 2.40, 2.70, 3.00])
-field = np.array([36, 165.9, 342.0, 509.0, 660.0, 803, 931.0, 1033.0, 1114.0, 1173.0, 1220.0]) / 1000 #T
+voltage = np.arange(0, 3, 0.1)
+field = np.array([34.1, 62.2, 110.3, 163.2, 220, 278, 335, 390, 446, 499, 550, 600, 650, 697, 745, 791, 837, 879, 919, 957, 992, 1025, 1054, 1082, 1106, 1129, 1151, 1170, 1187, 1203]) / 1000 #T
 
 def f_tri(x, a, b, c, d):
     return a*x**3 + b*x**2 + c*x+ d
