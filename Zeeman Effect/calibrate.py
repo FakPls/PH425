@@ -25,7 +25,7 @@ bx = axes[1]
 
 ax.scatter(field, voltage, s = 15, color = 'blue', label = 'Data')
 ax.plot(xModel, yModel, color = 'red', label = 'Fit')
-ax.set_title('Voltage vs Field')
+ax.set_title('Field vs Voltage')
 ax.set_ylabel('Voltage [V]')
 ax.set_xlabel('B Field [T]')
 ax.legend()
