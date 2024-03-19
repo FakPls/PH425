@@ -1,13 +1,17 @@
 import numpy as np
 from scipy.optimize import curve_fit
 from matplotlib import pyplot as plt
-from tau_vs_bins import params_vs_bins
+from tau_vs_bins import params_vs_bins, exp_fit
 
 files = [
-    R'Muon Lifetime\Data\Run 1\24-02-20-14-33.data',
-    R'Muon Lifetime\Data\Run 1\24-02-21-09-59.data',
+    # R'Muon Lifetime\Data\Run 1\24-02-20-14-33.data',
+    # R'Muon Lifetime\Data\Run 1\24-02-21-09-59.data',
     R'Muon Lifetime\Data\Run 2\24-02-27-15-38.data',
-    R'Muon Lifetime\Data\Run 2\24-02-28-09-49.data'
+    R'Muon Lifetime\Data\Run 2\24-02-28-09-49.data',
+    # R'Muon Lifetime\Data\Run 3\24-03-05-15-02.data',                #RUN WITH LED
+    # R'Muon Lifetime\Data\Run Misc\22-04-28-15-42.data',             #NOT OUR DATA
+    # R'Muon Lifetime\Data\Run Misc\23-01-17-17-20.data',             #NOT OUR DATA
+    # R'Muon Lifetime\Data\Run Misc\23-04-19-16-44.data',             #NOT OUR DATA
 ]
 
 lifetime = np.array([])
@@ -18,15 +22,12 @@ for file in files:
     lifetime = np.append(lifetime, lt)
     time = np.append(time, t)
 
-bin_number = 30
+bin_number = 27
 muon_decay_time = lifetime[lifetime < 20000]/1000
 hist, bins = np.histogram(muon_decay_time, bins = bin_number)
 hist_error = np.sqrt(hist)
 
-def exp_fit(x, A, tau, B):
-    return A * np.exp(-x/tau) + B
-
-popt, pcov = curve_fit(exp_fit, bins[1:], hist, sigma = hist_error)
+popt, pcov = curve_fit(exp_fit, bins[1:], hist, sigma = hist_error, maxfev = 1200, p0 = [7000, 2.2, 15])
 A, tau, B = popt
 A_err, tau_err, B_err = np.sqrt(np.diag(pcov)).reshape(1, -1)[0]
 x_model = np.linspace(min(bins), max(bins), 1000)
@@ -73,6 +74,36 @@ dx.set_ylabel("B")
 dx.plot(bins_changing, B_v_bins, color = 'Blue')
 dx.axvline(bin_number, color = 'Red', linestyle = 'dashed')
 dx.axhline(B_v_bins[bin_number - 4], color = 'Red', linestyle = 'dashed')
+
+
+
+fig2, axes2 = plt.subplots(3, 1, figsize = (7, 6), constrained_layout = True)
+
+aax = axes2[0]
+aax.set_title(r"${\sigma_\tau}$ Vs. Bin Number")
+aax.set_xlabel("Bin Number")
+aax.set_ylabel(r"${\sigma_\tau}$")
+aax.plot(bins_changing, Tau_v_bins_err, color = 'Blue')
+aax.axvline(bin_number, color = 'Red', linestyle = 'dashed')
+aax.axhline(Tau_v_bins_err[bin_number - 4], color = 'Red', linestyle = 'dashed')
+
+bbx = axes2[1]
+bbx.set_title(r"${\sigma_A}$ Vs. Bin Number")
+bbx.set_xlabel("Bin Number")
+bbx.set_ylabel(r"${\sigma_A}$")
+bbx.plot(bins_changing, A_v_bins_err, color = 'Blue')
+bbx.axvline(bin_number, color = 'Red', linestyle = 'dashed')
+bbx.axhline(A_v_bins_err[bin_number - 4], color = 'Red', linestyle = 'dashed')
+
+ccx = axes2[2]
+ccx.set_title(r"${\sigma_B}$ Vs. Bin Number")
+ccx.set_xlabel("Bin Number")
+ccx.set_ylabel(r"${\sigma_B}$")
+ccx.plot(bins_changing, B_v_bins_err, color = 'Blue')
+ccx.axvline(bin_number, color = 'Red', linestyle = 'dashed')
+ccx.axhline(B_v_bins_err[bin_number - 4], color = 'Red', linestyle = 'dashed')
+
+
 
 
 # bx = axes[1]
