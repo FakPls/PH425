@@ -6,8 +6,9 @@ from tau_vs_bins import params_vs_bins, exp_fit
 files = [
     # R'Muon Lifetime\Data\Run 1\24-02-20-14-33.data',
     # R'Muon Lifetime\Data\Run 1\24-02-21-09-59.data',
-    R'Muon Lifetime\Data\Run 2\24-02-27-15-38.data',
-    R'Muon Lifetime\Data\Run 2\24-02-28-09-49.data',
+    # R'Muon Lifetime\Data\Run 2\24-02-27-15-38.data',
+    # R'Muon Lifetime\Data\Run 2\24-02-28-09-49.data',
+    R'Muon Lifetime\Data\Run 4\24-03-19-16-06.data',
     # R'Muon Lifetime\Data\Run 3\24-03-05-15-02.data',                #RUN WITH LED
     # R'Muon Lifetime\Data\Run Misc\22-04-28-15-42.data',             #NOT OUR DATA
     # R'Muon Lifetime\Data\Run Misc\23-01-17-17-20.data',             #NOT OUR DATA
