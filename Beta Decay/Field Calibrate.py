@@ -2,6 +2,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 from matplotlib import pyplot as plt
 
+file = open('Beta Decay\Data\Calibration_Parameters.txt', 'w')
+
 def lin_fit(x, a, b):
     return a*x + b
 
@@ -20,6 +22,9 @@ xmodel = np.linspace(min(field), max(field), 1000)
 ymodel = lin_fit(xmodel, a, b)
 
 print('A:', a, "B:", b)
+
+file.write(str(a) + ',' + str(b))
+file.close()
 
 # plt.plot(voltage, field)
 plt.ylabel('Voltage [V]')
