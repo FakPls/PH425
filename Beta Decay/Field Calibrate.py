@@ -5,28 +5,27 @@ from matplotlib import pyplot as plt
 def lin_fit(x, a, b):
     return a*x + b
 
-voltage = np.arange(0, 5, 0.2)
-field = np.array([7.80, 7.80, 7.80, 7.80, 7.80, 7.80, 9.19, 14.12, 
-                  20.54, 26.55, 33.60, 41.09, 48.58, 55.88, 63.19, 
-                  70.08, 76.98, 83.75, 90.15, 96.68, 102.95, 109.25, 
-                  115.48, 121.68, 122.68])
+voltage = np.arange(0, 5.2, 0.2)
+field = np.array([7.93, 7.93, 7.93, 7.93, 7.95, 7.92, 7.93, 9.24, 14.44, 
+                  20.835, 26.995, 34.0, 41.3, 48.7, 56.0, 63.2, 70.3, 77.2, 
+                  83.9, 90.3, 96.8, 103.0, 109.4, 115.6, 121.8, 122.8])
 
-voltage = voltage[6:-1]
-field = field[6:-1]
+voltage = voltage[7:-1]
+field = field[7:-1]
 
-popt, pcov = curve_fit(lin_fit, voltage, field)
+popt, pcov = curve_fit(lin_fit, field, voltage)
 a, b = popt
 
-xmodel = np.linspace(min(voltage), max(voltage), 1000)
+xmodel = np.linspace(min(field), max(field), 1000)
 ymodel = lin_fit(xmodel, a, b)
 
 print('A:', a, "B:", b)
 
 # plt.plot(voltage, field)
-plt.xlabel('Voltage [V]')
-plt.ylabel('Field [mT]')
+plt.ylabel('Voltage [V]')
+plt.xlabel('Field [mT]')
 plt.plot(xmodel, ymodel, color = 'red', label = 'Fit')
-plt.scatter(voltage, field, color = 'black', s = 15, label = 'Data')
+plt.scatter(field, voltage, color = 'black', s = 15, label = 'Data')
 plt.legend()
 plt.grid()
 plt.show()
