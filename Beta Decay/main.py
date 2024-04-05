@@ -11,7 +11,7 @@ def f_lin_inverse(x, a, b):
     return (x - b)/a
 
 def f_gauss(x, A, mu, sig):
-    return A*np.exp(-(x-mu)**2/sig**2)
+    return A*np.exp(-(x-mu)**2/(2*sig**2))
 
 
 ###################################################################################################
@@ -44,7 +44,7 @@ field = f_lin_inverse(voltage, A, B)
 max, _ = find_peaks(count, height = np.max(count)/2)
 poi = np.max(max)
 
-peak_offset = 5
+peak_offset = 3
 x_interest = field[poi-peak_offset:poi+peak_offset]
 y_interest = count[poi-peak_offset:poi+peak_offset]
 
