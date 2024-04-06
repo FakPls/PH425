@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 
 ###################################################################################################
-#FITTING  FUNCTIONS
+#FITTING  FUNCTIONS / EXTRA FUNCTIONS
 
 def f_lin_inverse(x, a, b):
     return (x - b)/a
@@ -13,6 +13,11 @@ def f_lin_inverse(x, a, b):
 def f_gauss(x, A, mu, sig):
     return A*np.exp(-(x-mu)**2/(2*sig**2))
 
+def totuple(a):
+    try:
+        return tuple(totuple(i) for i in a)
+    except TypeError:
+        return a
 
 ###################################################################################################
 #READ CSV
@@ -24,7 +29,7 @@ files = [
 
 incriment = 0.1 #VOLTS
 
-A, B = np.genfromtxt('Beta Decay\Data\Calibration_Parameters.txt', delimiter = ',')
+A, B, min_field, max_field = np.genfromtxt('Beta Decay\Data\Calibration_Parameters.txt', delimiter = ',')
 
 count = np.array([])
 run = np.array([])
@@ -36,6 +41,11 @@ for file in files:
 
 voltage = run * incriment
 field = f_lin_inverse(voltage, A, B)
+
+mask = (field > min_field) & (field < max_field)
+count = count[mask]
+voltage = voltage[mask]
+field = field[mask]
 
 
 ###################################################################################################
@@ -56,7 +66,7 @@ x_gauss = np.linspace(np.min(x_interest), np.max(x_interest), 1000)
 y_gauss = f_gauss(x_gauss, a_opt, mu_opt, sig_opt)
 
 print('Gaussian Parameters: [A: %3f, Mu: %3f, Sigma: %3f]' % (a_opt, mu_opt, sig_opt))
-print('Errors on Gaussian Parameters:', np.sqrt(np.diag(pcov)))
+print('Errors on Gaussian Parameters: [A: %3f, Mu: %3f, Sigma: %3f]' % totuple(np.sqrt(np.diag(pcov))))
 
 ###################################################################################################
 #PLOTTING
