@@ -55,8 +55,8 @@ max, _ = find_peaks(count, height = np.max(count)/2)
 poi = np.max(max)
 
 peak_offset = 3
-x_interest = field[poi-peak_offset:poi+peak_offset]
-y_interest = count[poi-peak_offset:poi+peak_offset]
+x_interest = field[poi - peak_offset:poi + peak_offset]
+y_interest = count[poi - peak_offset:poi + peak_offset]
 
 #p0 = [amplitude guess, center guess, STD guess]
 popt, pcov = curve_fit(f_gauss, x_interest, y_interest, p0 = [40, 92, 5])
