@@ -24,7 +24,6 @@ def totuple(a):
 
 files = [
     # 'Beta Decay\Data\Manual Run 1.csv',
-    # 'Beta Decay\Data\Manual Run 1.txt',
     # 'Beta Decay\Data\Manual Run 2.csv',
     'Beta Decay\Data\Manual Run 3 1-5V.csv',
     'Beta Decay\Data\Manual Run 4 1-5V.csv'
