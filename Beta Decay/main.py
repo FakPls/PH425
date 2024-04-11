@@ -45,8 +45,6 @@ for file in files:
 voltage = run * incriment
 field = f_lin_inverse(voltage, A, B)
 
-print(field)
-
 
 mask = (field > min_field) & (field < max_field)
 count = count[mask]
@@ -79,7 +77,7 @@ print('Errors on Gaussian Parameters: [A: %3f, Mu: %3f, Sigma: %3f]' % totuple(n
 ###################################################################################################
 #PLOTTING
 
-fig, axes = plt.subplots(2, 1, figsize = (6, 6), constrained_layout = True)
+fig, axes = plt.subplots(2, 1, figsize = (8, 6), constrained_layout = True)
 
 ax = axes[0]
 bx = axes[1]
