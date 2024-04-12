@@ -23,10 +23,10 @@ def totuple(a):
 #READ CSV
 
 files = [
-    # 'Beta Decay\Data\Manual Run 1.csv',
-    # 'Beta Decay\Data\Manual Run 2.csv',
-    'Beta Decay\Data\Manual Run 3 1-5V.csv',
-    'Beta Decay\Data\Manual Run 4 1-5V.csv'
+    # 'Beta Decay\Data\Manual Run 1.csv',               #0-5V, incriment = 0.10
+    # 'Beta Decay\Data\Manual Run 2.csv',               #0-5V, incriment = 0.05
+    'Beta Decay\Data\Manual Run 3 1-5V.csv',          #1-5V, incriment = 0.04
+    'Beta Decay\Data\Manual Run 4 1-5V.csv'           #1-5V, incriment = 0.04
 ]
 
 incriment = 0.04 #VOLTS
@@ -52,6 +52,11 @@ count_err = np.sqrt(count)
 voltage = voltage[mask]
 field = field[mask]
 
+background = count[field > 100]
+avg_background = np.average(background)
+
+count = count - avg_background
+
 
 ###################################################################################################
 #CURVE FITTING
@@ -73,6 +78,7 @@ y_gauss = f_gauss(x_gauss, a_opt, mu_opt, sig_opt)
 
 print('Gaussian Parameters: [A: %3f, Mu: %3f, Sigma: %3f]' % (a_opt, mu_opt, sig_opt))
 print('Errors on Gaussian Parameters: [A: %3f, Mu: %3f, Sigma: %3f]' % totuple(np.sqrt(np.diag(pcov))))
+print('Average Background: %3f Counts' % avg_background)
 
 ###################################################################################################
 #PLOTTING

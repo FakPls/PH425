@@ -27,6 +27,7 @@ print('A:', a, "B:", b)
 file.write(str(a) + ',' + str(b) + ',' + str(min(field)) + ',' + str(max(field)))
 file.close()
 
+
 # plt.plot(voltage, field)
 plt.ylabel('Voltage [V]')
 plt.xlabel('Field [mT]')
