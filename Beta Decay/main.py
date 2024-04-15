@@ -29,10 +29,14 @@ files = [
     'Beta Decay\Data\Manual Run 4 1-5V.csv'           #1-5V, incriment = 0.04
 ]
 
-incriment = 0.04 #VOLTS
+incriment = 0.04            #VOLTS
+
+e_const = 1.60217663E-19    #C
+c_const = 299792458         #m/s
+m_0_c2 = 8.18712225E-14     #j
+r_const = 0.25               #m
 
 A, B, min_field, max_field = np.genfromtxt('Beta Decay\Data\Calibration_Parameters.txt', delimiter = ',')
-
 
 count = np.zeros(int(5/incriment))
 run = np.array([])
@@ -51,6 +55,9 @@ count = count[mask]
 count_err = np.sqrt(count)
 voltage = voltage[mask]
 field = field[mask]
+
+energy = (np.sqrt((m_0_c2)**2 + (e_const*c_const*r_const*field/1000)**2) - m_0_c2)
+energy = energy * 6.242E+18
 
 background = count[field > 100]
 avg_background = np.average(background)
@@ -83,12 +90,13 @@ print('Average Background: %3f Counts' % avg_background)
 ###################################################################################################
 #PLOTTING
 
-fig, axes = plt.subplots(2, 1, figsize = (8, 6), constrained_layout = True)
+fig, axes = plt.subplots(3, 1, figsize = (8, 6), constrained_layout = True)
 
 ax = axes[0]
 bx = axes[1]
+cx = axes[2]
 
-ax.set_title('Field vs Counts')
+ax.set_title('Counts vs Field')
 ax.set_xlabel('Field [mT]')
 ax.set_ylabel('Counts [#]')
 ax.grid()
@@ -104,6 +112,13 @@ bx.grid()
 bx.errorbar(x_interest, y_interest, yerr = err_interest, capsize = 3, label = 'Raw Data')
 bx.plot(x_gauss, y_gauss, label = 'Fit', color = 'red')
 bx.legend()
+
+cx.set_title('Counts vs Energy')
+cx.set_xlabel('Energy [eV]')
+cx.set_ylabel('Counts [#]')
+cx.grid()
+cx.errorbar(energy, count, yerr = count_err, capsize = 3, label = 'Raw Data')
+cx.legend()
 
 
 plt.show()
