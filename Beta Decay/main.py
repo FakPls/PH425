@@ -35,7 +35,7 @@ incriment = 0.04            #VOLTS
 e_const = 1.60217663E-19    #C
 c_const = 299792458         #m/s
 m_0_c2 = 8.18712225E-14     #j
-r_const = 0.25               #m
+r_const = 0.0381             #m
 
 A, B, min_field, max_field = np.genfromtxt('Beta Decay\Data\Calibration_Parameters.txt', delimiter = ',')
 
@@ -88,8 +88,6 @@ print('Gaussian Parameters: [A: %3f, Mu: %3f, Sigma: %3f]' % (a_opt, mu_opt, sig
 print('Errors on Gaussian Parameters: [A: %3f, Mu: %3f, Sigma: %3f]' % totuple(np.sqrt(np.diag(pcov))))
 print('Average Background: %3f Counts' % avg_background)
 
-recovred, remainder = deconvolve(count, y_gauss)
-print(recovred, remainder)
 
 ###################################################################################################
 #PLOTTING
@@ -105,7 +103,6 @@ ax.set_xlabel('Field [mT]')
 ax.set_ylabel('Counts [#]')
 ax.grid()
 ax.errorbar(field, count, yerr = count_err, capsize = 3, label = 'Raw Data')
-# ax.plot(field, recovered, label = 'Deconvolution', color = 'black')
 ax.plot(x_gauss, y_gauss, label = 'Fit', color = 'red')
 ax.scatter(field[max], count[max], marker = 'x', label = 'Maxima', color = 'green')
 ax.legend()
