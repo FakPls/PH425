@@ -88,9 +88,8 @@ print('Gaussian Parameters: [A: %3f, Mu: %3f, Sigma: %3f]' % (a_opt, mu_opt, sig
 print('Errors on Gaussian Parameters: [A: %3f, Mu: %3f, Sigma: %3f]' % totuple(np.sqrt(np.diag(pcov))))
 print('Average Background: %3f Counts' % avg_background)
 
-deconvolved_signal, remainder = deconvolve(count, y_gauss)
-
-print(deconvolved_signal)
+recovred, remainder = deconvolve(count, y_gauss)
+print(recovred, remainder)
 
 ###################################################################################################
 #PLOTTING
@@ -106,7 +105,7 @@ ax.set_xlabel('Field [mT]')
 ax.set_ylabel('Counts [#]')
 ax.grid()
 ax.errorbar(field, count, yerr = count_err, capsize = 3, label = 'Raw Data')
-ax.plot(field, deconvolved_signal, label = 'Deconvolution', color = 'black')
+# ax.plot(field, recovered, label = 'Deconvolution', color = 'black')
 ax.plot(x_gauss, y_gauss, label = 'Fit', color = 'red')
 ax.scatter(field[max], count[max], marker = 'x', label = 'Maxima', color = 'green')
 ax.legend()

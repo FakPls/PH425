@@ -11,10 +11,10 @@ def f_gauss(x, A, mu, sig):
     return A*np.exp(-(x-mu)**2/(2*sig**2))
 
 x = np.linspace(0, 10, 1000)
-y_gauss_1 = f_gauss(x, 2, 2, 1)
-y_gauss_2 = f_gauss(x, 2, 8, 1)
+y_gauss_1 = f_gauss(x, 2, 2, 0.5)
+y_gauss_2 = f_gauss(x, 2, 8, 2)
 
-y_conv = convolve(y_gauss_1, y_gauss_2, mode = 'same')
+y_conv = convolve(y_gauss_1, y_gauss_2, mode = 'same') / sum(y_gauss_2)
 
 
 plt.plot(x, y_gauss_1)
