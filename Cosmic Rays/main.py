@@ -18,24 +18,21 @@ files = [
 ]
 
 file = files[0]
-
-counts = np.array([])
-angle = np.arange(180, -1, -20)
-
 raw_csv = np.genfromtxt(file, delimiter = ',', skip_header = 1)
-rejected = np.zeros(len(raw_csv))
 
+angle = np.arange(90, -91, -20)
+angle_err = np.zeros(len(angle)) + 10
+counts = []
+count_err = []
 
-for i in range(len(raw_csv)):
-    rejected[i] = reject_outliers(raw_csv[i])
+for item in raw_csv:
+    counts.append(np.sum(item))
+    count_err.append(np.std(item))
     
-print(rejected)
-
-angle_error = np.zeros(len(angle)) + 10
 
 
 
-popt, pcov = curve_fit(f_cos_2, angle, counts)
+popt, pcov = curve_fit(f_cos_2, angle, counts, p0 = [0, 0, 0, 0])
 A_opt, B_opt, h_opt, k_opt = popt
 
 x_model = np.linspace(np.min(angle), np.max(angle), 1000)
@@ -49,7 +46,7 @@ main_plot.grid()
 main_plot.set_title('Counts vs Angle')
 main_plot.set_xlabel('Angle [Degrees]')
 main_plot.set_ylabel('Counts [#]')
-# main_plot.errorbar(angle, counts, xerr = angle_error, yerr = count_error)
-# main_plot.plot(x_model, y_model)
+main_plot.errorbar(angle, counts, xerr = angle_err, yerr = count_err)
+main_plot.plot(x_model, y_model)
 
-# plt.show()
+plt.show()
