@@ -6,11 +6,22 @@ from matplotlib import pyplot as plt
 def f_cos_2(x, A, B, h, k):
     return A * np.cos(B * (x - h))**2 + k
 
-def reject_outliers(data, m = 2.):
+def reject_outliers(data, m = 1):
     d = np.abs(data - np.median(data))
     mdev = np.median(d)
     s = d/mdev if mdev else np.zeros(len(d))
     return data[s<m]
+
+def totuple(a):
+    try:
+        return tuple(totuple(i) for i in a)
+    except TypeError:
+        return a
+    
+def percent_error(param, param_err):
+    return 100 * (param_err/param)
+    
+
 
 files = [
     # 'Cosmic Rays\Data\Run 1, delta_angle = 20, time = 2 min.csv',
@@ -32,11 +43,16 @@ for item in raw_csv:
 
 
 
-popt, pcov = curve_fit(f_cos_2, angle, counts, p0 = [0, 0, 0, 0])
+popt, pcov = curve_fit(f_cos_2, angle, counts, sigma = count_err, p0 = [0, 0, 0, 0])
 A_opt, B_opt, h_opt, k_opt = popt
+A_opt_err, B_opt_err, h_opt_err, k_opt_err = totuple(np.sqrt(np.diag(pcov)))
 
 x_model = np.linspace(np.min(angle), np.max(angle), 1000)
 y_model = f_cos_2(x_model, A_opt, B_opt, h_opt, k_opt)
+
+print('COS Optimal Parameters:          [A: %.4f, B: %.4f, h: %.4f, k: %.4f]' % (A_opt, B_opt, h_opt, k_opt))
+print('COS Optimal Parameters Error:    [A: %.4f, B: %.4f, h: %.4f, k: %.4f]' % (A_opt_err, B_opt_err, h_opt_err, k_opt_err))
+print('Percent Error:                   [A: %.4f%%, B: %.4f%%, h: %.4f%%, k: %.4f%%]' % (percent_error(A_opt, A_opt_err), percent_error(B_opt, B_opt_err), percent_error(h_opt, h_opt_err), percent_error(k_opt, k_opt_err)))
 
 fig, axes = plt.subplots(1, 1, figsize = (6, 6), constrained_layout = True)
 
