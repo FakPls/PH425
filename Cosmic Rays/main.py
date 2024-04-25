@@ -6,16 +6,34 @@ from matplotlib import pyplot as plt
 def f_cos_2(x, A, B, h, k):
     return A * np.cos(B * (x - h))**2 + k
 
+def reject_outliers(data, m = 2.):
+    d = np.abs(data - np.median(data))
+    mdev = np.median(d)
+    s = d/mdev if mdev else np.zeros(len(d))
+    return data[s<m]
+
 files = [
-    'Cosmic Rays\Data\Run 1, delta_angle = 10, time = 1 min - Sheet1.csv'
+    # 'Cosmic Rays\Data\Run 1, delta_angle = 20, time = 2 min.csv',
+    'Cosmic Rays\Data\Run 2, delta_angle = 20, time = 30s.csv'
 ]
 
-counts = np.array([])
-angle = np.arange(180, 0, -10)
+file = files[0]
 
-for file in files:
-    angle_temp, counts_temp = np.genfromtxt(file, delimiter = ',', skip_header = 1).T
-    counts = np.append(counts, counts_temp)
+counts = np.array([])
+angle = np.arange(180, -1, -20)
+
+raw_csv = np.genfromtxt(file, delimiter = ',', skip_header = 1)
+rejected = np.zeros(len(raw_csv))
+
+
+for i in range(len(raw_csv)):
+    rejected[i] = reject_outliers(raw_csv[i])
+    
+print(rejected)
+
+angle_error = np.zeros(len(angle)) + 10
+
+
 
 popt, pcov = curve_fit(f_cos_2, angle, counts)
 A_opt, B_opt, h_opt, k_opt = popt
@@ -31,6 +49,7 @@ main_plot.grid()
 main_plot.set_title('Counts vs Angle')
 main_plot.set_xlabel('Angle [Degrees]')
 main_plot.set_ylabel('Counts [#]')
-main_plot.scatter(angle, counts)
+# main_plot.errorbar(angle, counts, xerr = angle_error, yerr = count_error)
+# main_plot.plot(x_model, y_model)
 
-plt.show()
+# plt.show()
