@@ -35,12 +35,11 @@ raw_csv = np.genfromtxt(file, delimiter = ',', skip_header = 1)
 angle = np.arange(90, -91, -20)
 angle_err = np.zeros(len(angle)) + 10
 counts = []
-count_err = []
 
 for item in raw_csv:
     counts.append(np.sum(item))
-    count_err.append(np.std(item))
     
+count_err = np.sqrt(counts)
 
 popt, pcov = curve_fit(f_cos_2, angle, counts, sigma = count_err, p0 = [0, 0, 0, 0])
 A_opt, n_opt, phi_opt, B_opt = popt
@@ -59,10 +58,10 @@ print('COS Optimal Parameters Error:    [A: %.4f, n: %.4f, phi: %.4f, B: %.4f]' 
                                                                                  phi_opt_err, 
                                                                                  B_opt_err))
 
-print('Percent Error:                   [A: %.4f%%, n: %.4f%%, phi: %.4f%%, B: %.4f%%]' % (percent_error(A_opt, A_opt_err), 
-                                                                                         percent_error(n_opt, n_opt_err), 
-                                                                                         percent_error(phi_opt, phi_opt_err), 
-                                                                                         percent_error(B_opt, B_opt_err)))
+print('Percent Error:                   [A: %.4f%%, n: %.4f%%, phi: %.4f%%, B: %.4f%%]' % (np.abs(percent_error(A_opt, A_opt_err)), 
+                                                                                         np.abs(percent_error(n_opt, n_opt_err)), 
+                                                                                         np.abs(percent_error(phi_opt, phi_opt_err)), 
+                                                                                         np.abs(percent_error(B_opt, B_opt_err))))
 
 fig, axes = plt.subplots(1, 1, figsize = (6, 6), constrained_layout = True)
 main_plot = axes
@@ -71,7 +70,8 @@ main_plot.grid()
 main_plot.set_title('Counts vs Angle')
 main_plot.set_xlabel('Angle [Degrees]')
 main_plot.set_ylabel('Counts [#]')
-main_plot.errorbar(angle, counts, xerr = angle_err, yerr = count_err, color = 'black', label = 'Raw Data')
-main_plot.plot(x_model, y_model, color = 'red', label = 'Fit')
+main_plot.errorbar(angle, counts, xerr = angle_err, yerr = count_err, color = 'black', label = 'Raw Data', zorder = 0)
+main_plot.plot(x_model, y_model, color = 'red', label = 'Fit', zorder = 1)
+main_plot.legend()
 
 plt.show()
