@@ -3,8 +3,9 @@ from scipy.optimize import curve_fit
 from matplotlib import pyplot as plt
 
 
-def f_cos_2(x, A, B, h, k):
-    return A * np.cos(B * (x - h))**2 + k
+
+def f_cos_2(x, A, n, phi, B):
+    return A * np.cos(np.deg2rad(n * x + phi))**2 + B
 
 def reject_outliers(data, m = 1):
     d = np.abs(data - np.median(data))
@@ -41,28 +42,36 @@ for item in raw_csv:
     count_err.append(np.std(item))
     
 
-
-
 popt, pcov = curve_fit(f_cos_2, angle, counts, sigma = count_err, p0 = [0, 0, 0, 0])
-A_opt, B_opt, h_opt, k_opt = popt
-A_opt_err, B_opt_err, h_opt_err, k_opt_err = totuple(np.sqrt(np.diag(pcov)))
+A_opt, n_opt, phi_opt, B_opt = popt
+A_opt_err, n_opt_err, phi_opt_err, B_opt_err = totuple(np.sqrt(np.diag(pcov)))
 
 x_model = np.linspace(np.min(angle), np.max(angle), 1000)
-y_model = f_cos_2(x_model, A_opt, B_opt, h_opt, k_opt)
+y_model = f_cos_2(x_model, A_opt, n_opt, phi_opt, B_opt)
 
-print('COS Optimal Parameters:          [A: %.4f, B: %.4f, h: %.4f, k: %.4f]' % (A_opt, B_opt, h_opt, k_opt))
-print('COS Optimal Parameters Error:    [A: %.4f, B: %.4f, h: %.4f, k: %.4f]' % (A_opt_err, B_opt_err, h_opt_err, k_opt_err))
-print('Percent Error:                   [A: %.4f%%, B: %.4f%%, h: %.4f%%, k: %.4f%%]' % (percent_error(A_opt, A_opt_err), percent_error(B_opt, B_opt_err), percent_error(h_opt, h_opt_err), percent_error(k_opt, k_opt_err)))
+print('COS Optimal Parameters:          [A: %.4f, n: %.4f, phi: %.4f, B: %.4f]' % (A_opt, 
+                                                                                 n_opt, 
+                                                                                 phi_opt, 
+                                                                                 B_opt))
+
+print('COS Optimal Parameters Error:    [A: %.4f, n: %.4f, phi: %.4f, B: %.4f]' % (A_opt_err, 
+                                                                                 n_opt_err, 
+                                                                                 phi_opt_err, 
+                                                                                 B_opt_err))
+
+print('Percent Error:                   [A: %.4f%%, n: %.4f%%, phi: %.4f%%, B: %.4f%%]' % (percent_error(A_opt, A_opt_err), 
+                                                                                         percent_error(n_opt, n_opt_err), 
+                                                                                         percent_error(phi_opt, phi_opt_err), 
+                                                                                         percent_error(B_opt, B_opt_err)))
 
 fig, axes = plt.subplots(1, 1, figsize = (6, 6), constrained_layout = True)
-
 main_plot = axes
 
 main_plot.grid()
 main_plot.set_title('Counts vs Angle')
 main_plot.set_xlabel('Angle [Degrees]')
 main_plot.set_ylabel('Counts [#]')
-main_plot.errorbar(angle, counts, xerr = angle_err, yerr = count_err)
-main_plot.plot(x_model, y_model)
+main_plot.errorbar(angle, counts, xerr = angle_err, yerr = count_err, color = 'black', label = 'Raw Data')
+main_plot.plot(x_model, y_model, color = 'red', label = 'Fit')
 
 plt.show()
