@@ -84,7 +84,7 @@ main_plot.legend()
 fig_3d = plt.figure()
 ax = fig_3d.add_subplot(111, projection = '3d')
 
-ax.plot_surface(X, Y, Z, color = 'red')
+ax.plot_surface(X, Y, Z, color = 'red', alpha = 0.5)
 ax.set_title('Counts vs Angle')
 ax.set_xlabel('Angle [Degrees]')
 ax.set_ylabel('Angle [Degrees]')
