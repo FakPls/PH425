@@ -58,6 +58,8 @@ y = np.linspace(-90, 90, num_points)
 X, Y = np.meshgrid(x, y)
 Z = f_cos_2_3d(X, Y, A_opt, n_opt, B_opt)
 
+integral = np.sum(Z)
+
 print('COS Optimal Parameters:          [A: %.4f, n: %.4f, B: %.4f]' % (A_opt, 
                                                                         n_opt,  
                                                                         B_opt))
@@ -70,6 +72,7 @@ print('Percent Error:                   [A: %.4f%%, n: %.4f%%, B: %.4f%%]' % (np
                                                                             np.abs(percent_error(n_opt, n_opt_err)),  
                                                                             np.abs(percent_error(B_opt, B_opt_err))))
 
+print("Total Integral:                  [Sum: %.4f]" % integral)
 fig, axes = plt.subplots(1, 1, figsize = (6, 6), constrained_layout = True)
 main_plot = axes
 
