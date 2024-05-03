@@ -53,7 +53,7 @@ x_model = np.linspace(np.min(angle), np.max(angle), 1000)
 y_model = f_cos_2(x_model, A_opt)
 
 
-area = 33 * 7
+area = 30.5 * 7.5
 num_points = 1000
 x = np.linspace(-90, 90, num_points)
 y = np.linspace(-90, 90, num_points)
