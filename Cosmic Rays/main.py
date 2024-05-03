@@ -4,11 +4,11 @@ from matplotlib import pyplot as plt
 
 
 
-def f_cos_2(x, A, n, B):
-    return A * np.cos(np.deg2rad(n * x))**2 + B
+def f_cos_2(x, A):
+    return A * np.cos(np.deg2rad(x))**2
 
-def f_cos_2_3d(x, y, A, n, B):
-    return ((A * np.cos(np.deg2rad(n * x))**2 + B) + (A * np.cos(np.deg2rad(n * y))**2 + B)) / 2
+def f_cos_2_3d(x, y, A):
+    return ((A * np.cos(np.deg2rad(x))**2) + (A * np.cos(np.deg2rad(y))**2)) / 2
 
 def reject_outliers(data, m = 1):
     d = np.abs(data - np.median(data))
@@ -40,39 +40,37 @@ angle_err = np.zeros(len(angle)) + 10
 counts = []
 
 for item in raw_csv:
-    temp = np.sort(item)[3:-2]
+    temp = np.sort(item)[:-10]
     counts.append(np.sum(temp))
     
 count_err = np.sqrt(counts)
 
-popt, pcov = curve_fit(f_cos_2, angle, counts, sigma = count_err, p0 = [0, 0, 0])
-A_opt, n_opt, B_opt = popt
-A_opt_err, n_opt_err, B_opt_err = totuple(np.sqrt(np.diag(pcov)))
+popt, pcov = curve_fit(f_cos_2, angle, counts, sigma = count_err, p0 = [0])
+A_opt = popt
+A_opt_err = totuple(np.sqrt(np.diag(pcov)))
 
 x_model = np.linspace(np.min(angle), np.max(angle), 1000)
-y_model = f_cos_2(x_model, A_opt, n_opt, B_opt)
+y_model = f_cos_2(x_model, A_opt)
 
+
+area = 33 * 7
 num_points = 1000
 x = np.linspace(-90, 90, num_points)
 y = np.linspace(-90, 90, num_points)
 X, Y = np.meshgrid(x, y)
-Z = f_cos_2_3d(X, Y, A_opt, n_opt, B_opt)
+Z = f_cos_2_3d(X, Y, A_opt)
 
-integral = np.sum(Z)
+I_vert = A_opt / area
+integral = np.sum(Z) * I_vert
 
-print('COS Optimal Parameters:          [A: %.4f, n: %.4f, B: %.4f]' % (A_opt, 
-                                                                        n_opt,  
-                                                                        B_opt))
+print('COS Optimal Parameters:          [A: %.4f]' % (A_opt, ))
 
-print('COS Optimal Parameters Error:    [A: %.4f, n: %.4f, B: %.4f]' % (A_opt_err, 
-                                                                                 n_opt_err, 
-                                                                                 B_opt_err))
+print('COS Optimal Parameters Error:    [A: %.4f]' % (A_opt_err))
 
-print('Percent Error:                   [A: %.4f%%, n: %.4f%%, B: %.4f%%]' % (np.abs(percent_error(A_opt, A_opt_err)), 
-                                                                            np.abs(percent_error(n_opt, n_opt_err)),  
-                                                                            np.abs(percent_error(B_opt, B_opt_err))))
+print('Percent Error:                   [A: %.4f%%]' % (np.abs(percent_error(A_opt, A_opt_err))))
 
-print("Total Integral:                  [Sum: %.4f]" % integral)
+print("Values:                          [I_vert: %.4f, Integral: %.4f]" % (I_vert, integral))
+
 fig, axes = plt.subplots(1, 1, figsize = (6, 6), constrained_layout = True)
 main_plot = axes
 
