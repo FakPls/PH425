@@ -7,8 +7,8 @@ from matplotlib import pyplot as plt
 def f_cos_2(x, A):
     return A * np.cos(np.deg2rad(x))**2
 
-def f_cos_2_3d(x, y, A):
-    return ((A * np.cos(np.deg2rad(x))**2) + (A * np.cos(np.deg2rad(y))**2)) / 2
+def f_cos_2_3d(r, A):
+    return A * np.cos(np.deg2rad(r))**2
 
 def reject_outliers(data, m = 1):
     d = np.abs(data - np.median(data))
@@ -35,15 +35,22 @@ files = [
 file = files[0]
 raw_csv = np.genfromtxt(file, delimiter = ',', skip_header = 1)
 
+area = 30.5 * 7.5
+area_err = 0.3E2
+runtime = 30
 angle = np.arange(90, -91, -20)
 angle_err = np.zeros(len(angle)) + 10
 counts = []
 
 for item in raw_csv:
-    temp = np.sort(item)[:-10]
+    temp = np.sort(item)[3:-3]
     counts.append(np.sum(temp))
-    
+
+
 count_err = np.sqrt(counts)
+background = np.min(counts)
+
+counts -= background
 
 popt, pcov = curve_fit(f_cos_2, angle, counts, sigma = count_err, p0 = [0])
 A_opt = popt
@@ -53,31 +60,40 @@ x_model = np.linspace(np.min(angle), np.max(angle), 1000)
 y_model = f_cos_2(x_model, A_opt)
 
 
-area = 30.5 * 7.5
-num_points = 1000
-x = np.linspace(-90, 90, num_points)
-y = np.linspace(-90, 90, num_points)
-X, Y = np.meshgrid(x, y)
-Z = f_cos_2_3d(X, Y, A_opt)
 
-I_vert = A_opt / area
-integral = np.sum(Z) * I_vert
+num_points = len(counts)
+r = np.linspace(-90, 90, num_points)
+phi = np.linspace(0, 2 * np.pi, num_points)
+R, P = np.meshgrid(r, phi)
+Z = f_cos_2_3d(R, A_opt)
 
-print('COS Optimal Parameters:          [A: %.4f]' % (A_opt, ))
+X, Y = R * np.cos(P), R * np.sin(P)
 
-print('COS Optimal Parameters Error:    [A: %.4f]' % (A_opt_err))
 
-print('Percent Error:                   [A: %.4f%%]' % (np.abs(percent_error(A_opt, A_opt_err))))
+I_vert = A_opt / area / 60 * len(counts)
+I_ver_err = 2E-4
+integral = np.sum(Z) / np.diff(r)[0] * I_vert
+integral_err = I_ver_err + np.average(count_err)
+
+print('COS Optimal Parameters:          [A: %.4f, B: %.4f]' % (A_opt, background))
+
+print('COS Optimal Parameters Error:    [A: %.4f, B: %.4f]' % (A_opt_err[0], np.min(count_err)))
+
+print('Percent Error:                   [A: %.4f%%, B: %.4f%%]' % (np.abs(percent_error(A_opt, A_opt_err)), np.abs(percent_error(background, count_err[count_err.argmin()]))))
 
 print("Values:                          [I_vert: %.4f, Integral: %.4f]" % (I_vert, integral))
+
+print("Values Error:                    [I_vert: %.4f, Integral: %.4f]" % (I_ver_err, integral_err))
+
+print('Percent Error:                   [I_vert: %.4f%%, Integral: %.4f%%]' % (np.abs(percent_error(I_vert, I_ver_err)), np.abs(percent_error(integral, integral_err))))
 
 fig, axes = plt.subplots(1, 1, figsize = (6, 6), constrained_layout = True)
 main_plot = axes
 
 main_plot.grid()
 main_plot.set_title('Counts vs Angle')
-main_plot.set_xlabel('Angle [Degrees]')
-main_plot.set_ylabel('Counts [#]')
+main_plot.set_xlabel(r'$\theta$ [Degrees]')
+main_plot.set_ylabel(r'Counts per Second [$\frac{\#}{s}$]')
 main_plot.errorbar(angle, counts, xerr = angle_err, yerr = count_err, color = 'black', label = 'Raw Data', zorder = 0)
 main_plot.plot(x_model, y_model, color = 'red', label = 'Fit', zorder = 1)
 main_plot.legend()
@@ -87,9 +103,9 @@ ax = fig_3d.add_subplot(111, projection = '3d')
 
 ax.plot_surface(X, Y, Z, color = 'red', alpha = 0.5)
 ax.set_title('Counts vs Angle')
-ax.set_xlabel('Angle [Degrees]')
-ax.set_ylabel('Angle [Degrees]')
-ax.set_zlabel('Counts [#]')
+ax.set_xlabel(r'$\phi$ [Degrees]')
+ax.set_ylabel(r'$\phi$ [Degrees]')
+ax.set_zlabel(r'Counts per Second [$\frac{\#}{s}$]')
 ax.grid()
 
 plt.show()
