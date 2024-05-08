@@ -26,11 +26,16 @@ A_opt_err, k_opt_err, B_opt_err = totuple(np.sqrt(np.diag(pcov)))
 x_model = np.linspace(np.min(voltage), np.max(voltage), 1000)
 y_model = f_exp(x_model, A_opt, k_opt, B_opt)
 
+
 fig, axes = plt.subplots(1, 1, figsize = (6, 6), constrained_layout = True)
 ax = axes
 
 ax.errorbar(voltage, CPM, yerr = CPM_err, marker = 'o', ls = 'none', color = 'black', label = 'Raw Data')
-ax.plot(x_model, y_model, color = 'red', label = 'Fit')
+ax.axvspan(-1.65, -1.45, alpha = 0.5, color = 'green', label = 'Area of Interest')
+# ax.plot(x_model, y_model, color = 'red', label = 'Fit')
+ax.set_xlabel('Threshold Voltage [V]')
+ax.set_ylabel('Counts [#]')
+ax.set_title('Counts vs Threshold Voltage')
 ax.grid()
 ax.legend()
 

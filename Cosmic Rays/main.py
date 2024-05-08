@@ -41,10 +41,15 @@ runtime = 30
 angle = np.arange(90, -91, -20)
 angle_err = np.zeros(len(angle)) + 10
 counts = []
+counts_raw = []
+num_runs = 0
 
 for item in raw_csv:
     temp = np.sort(item)[3:-3]
+    temp_raw = np.sort(item)
     counts.append(np.sum(temp))
+    counts_raw.append(np.sum(temp_raw))
+    num_runs = len(temp)
 
 
 count_err = np.sqrt(counts)
@@ -54,11 +59,18 @@ counts -= background
 
 popt, pcov = curve_fit(f_cos_2, angle, counts, sigma = count_err, p0 = [0])
 A_opt = popt
-A_opt_err = totuple(np.sqrt(np.diag(pcov)))
+A_opt_err = np.sqrt(np.diag(pcov))
 
 x_model = np.linspace(np.min(angle), np.max(angle), 1000)
 y_model = f_cos_2(x_model, A_opt)
 
+mu = 0
+sigma = 40
+gauss = np.exp( - (x_model - mu)**2 / (2 * sigma**2))
+
+conv = np.convolve(y_model, gauss, mode = 'same')
+conv /= np.max(conv)
+conv *= A_opt
 
 
 num_points = len(counts)
@@ -69,11 +81,14 @@ Z = f_cos_2_3d(R, A_opt)
 
 X, Y = R * np.cos(P), R * np.sin(P)
 
+I_vert = A_opt / (30 / num_runs) / area
+# I_vert_err = A_opt_err[0] / (30 / num_runs) / area_err
+I_vert_err = 0.01
 
-I_vert = A_opt / area / 60 * len(counts)
-I_ver_err = 2E-4
-integral = np.sum(Z) / np.diff(r)[0] * I_vert
-integral_err = I_ver_err + np.average(count_err)
+integral = np.sum(Z) / np.diff(r)[0] * I_vert 
+integral_err = I_vert * 2 * np.pi
+
+
 
 print('COS Optimal Parameters:          [A: %.4f, B: %.4f]' % (A_opt, background))
 
@@ -83,19 +98,32 @@ print('Percent Error:                   [A: %.4f%%, B: %.4f%%]' % (np.abs(percen
 
 print("Values:                          [I_vert: %.4f, Integral: %.4f]" % (I_vert, integral))
 
-print("Values Error:                    [I_vert: %.4f, Integral: %.4f]" % (I_ver_err, integral_err))
+print("Values Error:                    [I_vert: %.4f, Integral: %.4f]" % (I_vert_err, integral_err))
 
-print('Percent Error:                   [I_vert: %.4f%%, Integral: %.4f%%]' % (np.abs(percent_error(I_vert, I_ver_err)), np.abs(percent_error(integral, integral_err))))
+print('Percent Error:                   [I_vert: %.4f%%, Integral: %.4f%%]' % (np.abs(percent_error(I_vert, I_vert_err)), np.abs(percent_error(integral, integral_err))))
 
 fig, axes = plt.subplots(1, 1, figsize = (6, 6), constrained_layout = True)
 main_plot = axes
 
+
+# raw_plot.grid()
+# raw_plot.set_axisbelow(True)
+# raw_plot.set_title('Counts vs Angle\n(RAW)')
+# raw_plot.set_xlabel(r'$\theta$ [Degrees]')
+# raw_plot.set_ylabel('Counts [#]')
+# raw_plot.errorbar(angle, counts_raw, xerr = angle_err, yerr = count_err, ls='none', color = 'black', label = 'Raw Data', zorder = 1)
+# raw_plot.legend()
+
+count_err = np.sqrt(counts)
+
 main_plot.grid()
-main_plot.set_title('Counts vs Angle')
+main_plot.set_axisbelow(True)
+main_plot.set_title('Counts vs Angle\n(OUTLIERS REMOVED, BACKGROUND REMOVED)')
 main_plot.set_xlabel(r'$\theta$ [Degrees]')
-main_plot.set_ylabel(r'Counts per Second [$\frac{\#}{s}$]')
-main_plot.errorbar(angle, counts, xerr = angle_err, yerr = count_err, color = 'black', label = 'Raw Data', zorder = 0)
-main_plot.plot(x_model, y_model, color = 'red', label = 'Fit', zorder = 1)
+main_plot.set_ylabel('Counts [#]')
+main_plot.errorbar(angle, counts, xerr = angle_err, yerr = count_err, ls='none', color = 'black', label = 'Raw Data', zorder = 1)
+main_plot.plot(x_model, y_model, color = 'red', label = 'Fit', zorder = 2)
+main_plot.plot(x_model, conv, color = 'green', label = "Convolved Fit", zorder = 3)
 main_plot.legend()
 
 fig_3d = plt.figure()
