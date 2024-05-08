@@ -4,8 +4,8 @@ from matplotlib import pyplot as plt
 
 
 
-def f_cos_2(x, A):
-    return A * np.cos(np.deg2rad(x))**2
+def f_cos_2(x, A, B):
+    return A * np.cos(np.deg2rad(x))**2 + B
 
 def f_cos_2_3d(r, A):
     return A * np.cos(np.deg2rad(r))**2
@@ -55,14 +55,14 @@ for item in raw_csv:
 count_err = np.sqrt(counts)
 background = np.min(counts)
 
-counts -= background
+# counts -= background
 
-popt, pcov = curve_fit(f_cos_2, angle, counts, sigma = count_err, p0 = [0])
-A_opt = popt
-A_opt_err = np.sqrt(np.diag(pcov))
+popt, pcov = curve_fit(f_cos_2, angle, counts, sigma = count_err, p0 = [0, 0])
+A_opt, B_opt = popt
+A_opt_err, B_opt_err = totuple(np.sqrt(np.diag(pcov)))
 
 x_model = np.linspace(np.min(angle), np.max(angle), 1000)
-y_model = f_cos_2(x_model, A_opt)
+y_model = f_cos_2(x_model, A_opt, B_opt)
 
 mu = 0
 sigma = 40
@@ -92,7 +92,7 @@ integral_err = I_vert * 2 * np.pi
 
 print('COS Optimal Parameters:          [A: %.4f, B: %.4f]' % (A_opt, background))
 
-print('COS Optimal Parameters Error:    [A: %.4f, B: %.4f]' % (A_opt_err[0], np.min(count_err)))
+print('COS Optimal Parameters Error:    [A: %.4f, B: %.4f]' % (A_opt_err, np.min(count_err)))
 
 print('Percent Error:                   [A: %.4f%%, B: %.4f%%]' % (np.abs(percent_error(A_opt, A_opt_err)), np.abs(percent_error(background, count_err[count_err.argmin()]))))
 
@@ -102,38 +102,39 @@ print("Values Error:                    [I_vert: %.4f, Integral: %.4f]" % (I_ver
 
 print('Percent Error:                   [I_vert: %.4f%%, Integral: %.4f%%]' % (np.abs(percent_error(I_vert, I_vert_err)), np.abs(percent_error(integral, integral_err))))
 
-fig, axes = plt.subplots(1, 1, figsize = (6, 6), constrained_layout = True)
-main_plot = axes
+fig, axes = plt.subplots(1, 2, figsize = (12, 6), constrained_layout = True)
+main_plot = axes[1]
+raw_plot = axes[0]
 
 
-# raw_plot.grid()
-# raw_plot.set_axisbelow(True)
-# raw_plot.set_title('Counts vs Angle\n(RAW)')
-# raw_plot.set_xlabel(r'$\theta$ [Degrees]')
-# raw_plot.set_ylabel('Counts [#]')
-# raw_plot.errorbar(angle, counts_raw, xerr = angle_err, yerr = count_err, ls='none', color = 'black', label = 'Raw Data', zorder = 1)
-# raw_plot.legend()
+raw_plot.grid()
+raw_plot.set_axisbelow(True)
+raw_plot.set_title('Counts vs Angle\n(RAW)')
+raw_plot.set_xlabel(r'$\theta$ [Degrees]')
+raw_plot.set_ylabel('Counts [#]')
+raw_plot.errorbar(angle, counts_raw, xerr = angle_err, yerr = count_err, ls='none', color = 'black', label = 'Raw Data', zorder = 1)
+raw_plot.legend()
 
-count_err = np.sqrt(counts)
+# count_err = np.sqrt(counts)
 
 main_plot.grid()
 main_plot.set_axisbelow(True)
-main_plot.set_title('Counts vs Angle\n(OUTLIERS REMOVED, BACKGROUND REMOVED)')
+main_plot.set_title('Counts vs Angle\n(OUTLIERS REMOVED)')
 main_plot.set_xlabel(r'$\theta$ [Degrees]')
 main_plot.set_ylabel('Counts [#]')
 main_plot.errorbar(angle, counts, xerr = angle_err, yerr = count_err, ls='none', color = 'black', label = 'Raw Data', zorder = 1)
 main_plot.plot(x_model, y_model, color = 'red', label = 'Fit', zorder = 2)
-main_plot.plot(x_model, conv, color = 'green', label = "Convolved Fit", zorder = 3)
+# main_plot.plot(x_model, conv, color = 'green', label = "Convolved Fit", zorder = 3)
 main_plot.legend()
 
-fig_3d = plt.figure()
-ax = fig_3d.add_subplot(111, projection = '3d')
+# fig_3d = plt.figure()
+# ax = fig_3d.add_subplot(111, projection = '3d')
 
-ax.plot_surface(X, Y, Z, color = 'red', alpha = 0.5)
-ax.set_title('Counts vs Angle')
-ax.set_xlabel(r'$\phi$ [Degrees]')
-ax.set_ylabel(r'$\phi$ [Degrees]')
-ax.set_zlabel(r'Counts per Second [$\frac{\#}{s}$]')
-ax.grid()
+# ax.plot_surface(X, Y, Z, color = 'red', alpha = 0.5)
+# ax.set_title('Counts vs Angle')
+# ax.set_xlabel(r'$\phi$ [Degrees]')
+# ax.set_ylabel(r'$\phi$ [Degrees]')
+# ax.set_zlabel(r'Counts per Second [$\frac{\#}{s}$]')
+# ax.grid()
 
 plt.show()
